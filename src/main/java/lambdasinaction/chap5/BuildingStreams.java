@@ -54,6 +54,7 @@ public class BuildingStreams {
           .forEach(System.out::println);
    
 
+        // java 的 lambda 带状态的例子
         IntSupplier fib = new IntSupplier(){
                   private int previous = 0;
                   private int current = 1;
