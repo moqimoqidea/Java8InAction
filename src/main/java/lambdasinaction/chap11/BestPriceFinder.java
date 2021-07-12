@@ -47,14 +47,18 @@ public class BestPriceFinder {
                 .collect(Collectors.<CompletableFuture<String>>toList());
 
         return priceFutures.stream()
+                // 等待流中的所有 Future 执行完毕，提取各自的返回值
                 .map(CompletableFuture::join)
                 .collect(Collectors.toList());
     }
 
     public Stream<CompletableFuture<String>> findPricesStream(String product) {
         return shops.stream()
+                // 以异步方式取得每个 shop 中指定产品的原始价格
                 .map(shop -> CompletableFuture.supplyAsync(() -> shop.getPrice(product), executor))
+                // Quota 对象存在时，对返回的值进行转换
                 .map(future -> future.thenApply(Quote::parse))
+                // 使用另一个异步任务构造期望的 Future, 申请折扣
                 .map(future -> future.thenCompose(quote -> CompletableFuture.supplyAsync(() -> Discount.applyDiscount(quote), executor)));
     }
 

@@ -29,6 +29,7 @@ public class BestPriceFinder {
         @Override
         public Thread newThread(Runnable r) {
             Thread t = new Thread(r);
+            // 使用守护线程，这种方式不会阻止程序的关停
             t.setDaemon(true);
             return t;
         }
