@@ -2,6 +2,9 @@ package lambdasinaction.chap7;
 
 import java.util.stream.*;
 
+/**
+ * 如何提升并行流的性能
+ */
 public class ParallelStreams {
 
     public static long iterativeSum(long n) {
