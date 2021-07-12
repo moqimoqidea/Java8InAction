@@ -55,15 +55,23 @@ public class WordCount {
             this.lastSpace = lastSpace;
         }
 
+        /**
+         * 和迭代算法一样，accumulate 方法一个个遍历 Character
+         */
         public WordCounter accumulate(Character c) {
             if (Character.isWhitespace(c)) {
+                // 上一个字符是空格，而当前遍历的字符不是空格时，将单词计数器加一
                 return lastSpace ? this : new WordCounter(counter, true);
             } else {
                 return lastSpace ? new WordCounter(counter+1, false) : this;
             }
         }
 
+        /**
+         * 合并两个 WordCounter, 把其计数器加起来
+         */
         public WordCounter combine(WordCounter wordCounter) {
+            // 仅需要计数器的总和，无需关系 lastSpace
             return new WordCounter(counter + wordCounter.counter, wordCounter.lastSpace);
         }
 
@@ -83,7 +91,9 @@ public class WordCount {
 
         @Override
         public boolean tryAdvance(Consumer<? super Character> action) {
+            // 处理当前字符
             action.accept(string.charAt(currentChar++));
+            // 如果还有字符要处理，则返回 true
             return currentChar < string.length();
         }
 
@@ -91,11 +101,18 @@ public class WordCount {
         public Spliterator<Character> trySplit() {
             int currentSize = string.length() - currentChar;
             if (currentSize < 10) {
+                // 返回 null 表示要解析的 String 已经足够小，可以顺序处理
                 return null;
             }
-            for (int splitPos = currentSize / 2 + currentChar; splitPos < string.length(); splitPos++) {
+            for (int splitPos = currentSize / 2 + currentChar;
+                 // 将试探拆分位置设定为要解析的 String 的中间
+                 splitPos < string.length();
+                 splitPos++) {
+                // 让拆分位置前进直到下一个空格
                 if (Character.isWhitespace(string.charAt(splitPos))) {
+                    // 创建一个新的 WordCounterSpliterator 来解析 String 从开始到拆分位置的部分
                     Spliterator<Character> spliterator = new WordCounterSpliterator(string.substring(currentChar, splitPos));
+                    // 将这个 WordCounterSpliterator 的起始位置设为拆分位置
                     currentChar = splitPos;
                     return spliterator;
                 }

@@ -52,23 +52,27 @@ public class PartitionPrimeNumbers {
 
         @Override
         public Supplier<Map<Boolean, List<Integer>>> supplier() {
-            return () -> new HashMap<Boolean, List<Integer>>() {{
-                put(true, new ArrayList<Integer>());
-                put(false, new ArrayList<Integer>());
+            // 从一个有两个空 List 的 Map 开始收集过程
+            return () -> new HashMap<>() {{
+                put(true, new ArrayList<>());
+                put(false, new ArrayList<>());
             }};
         }
 
         @Override
         public BiConsumer<Map<Boolean, List<Integer>>, Integer> accumulator() {
             return (Map<Boolean, List<Integer>> acc, Integer candidate) -> {
-                acc.get( isPrime( acc.get(true),
-                        candidate) )
+                acc.get(
+                        // 将已经找到的质数列表传递给 isPrime 方法
+                        isPrime(acc.get(true), candidate))
+                        // 根据 iPrime 方法的返回值，从 Map 中取质数或非质数列表，把当前的被测数加进去
                         .add(candidate);
             };
         }
 
         @Override
         public BinaryOperator<Map<Boolean, List<Integer>>> combiner() {
+            // 将第二个 Map 合并到第一个
             return (Map<Boolean, List<Integer>> map1, Map<Boolean, List<Integer>> map2) -> {
                 map1.get(true).addAll(map2.get(true));
                 map1.get(false).addAll(map2.get(false));
@@ -78,11 +82,13 @@ public class PartitionPrimeNumbers {
 
         @Override
         public Function<Map<Boolean, List<Integer>>, Map<Boolean, List<Integer>>> finisher() {
-            return i -> i;
+            // 收集过程最后无需转换，因此使用 identity 函数收尾
+            return Function.identity();
         }
 
         @Override
         public Set<Characteristics> characteristics() {
+            // 这个收集器是 IDENTITY_FINISH, 但既不是 UNORDERED 也不是 CONCURRENT, 因为质数是按顺序发现的
             return Collections.unmodifiableSet(EnumSet.of(IDENTITY_FINISH));
         }
     }
@@ -90,14 +96,17 @@ public class PartitionPrimeNumbers {
     public Map<Boolean, List<Integer>> partitionPrimesWithInlineCollector(int n) {
         return Stream.iterate(2, i -> i + 1).limit(n)
                 .collect(
+                        // 供应源
                         () -> new HashMap<Boolean, List<Integer>>() {{
                             put(true, new ArrayList<Integer>());
                             put(false, new ArrayList<Integer>());
                         }},
+                        // 累加器
                         (acc, candidate) -> {
                             acc.get( isPrime(acc.get(true), candidate) )
                                     .add(candidate);
                         },
+                        // 组合器
                         (map1, map2) -> {
                             map1.get(true).addAll(map2.get(true));
                             map1.get(false).addAll(map2.get(false));
