@@ -7,6 +7,16 @@ public class ParallelStreamsHarness {
 
     public static final ForkJoinPool FORK_JOIN_POOL = new ForkJoinPool();
 
+    /**
+     * Iterative Sum done in: 4 msecs
+     * Sequential Sum done in: 106 msecs
+     * Parallel forkJoinSum done in: 238 msecs
+     * Range forkJoinSum done in: 12 msecs
+     * Parallel range forkJoinSum done in: 3 msecs
+     * ForkJoin sum done in: 21 msecs
+     * SideEffect sum done in: 24 msecs
+     * SideEffect parallel sum done in: 58 msecs
+     */
     public static void main(String[] args) {
         System.out.println("Iterative Sum done in: " + measurePerf(ParallelStreams::iterativeSum, 10_000_000L) + " msecs");
         System.out.println("Sequential Sum done in: " + measurePerf(ParallelStreams::sequentialSum, 10_000_000L) + " msecs");
@@ -22,9 +32,9 @@ public class ParallelStreamsHarness {
         long fastest = Long.MAX_VALUE;
         for (int i = 0; i < 10; i++) {
             long start = System.nanoTime();
-            R result = f.apply(input);
+            /*R result = */ f.apply(input);
             long duration = (System.nanoTime() - start) / 1_000_000;
-            System.out.println("Result: " + result);
+            // System.out.println("Result: " + result);
             if (duration < fastest) fastest = duration;
         }
         return fastest;
