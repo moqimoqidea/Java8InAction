@@ -14,8 +14,10 @@ public class PatternMatching {
     }
 
     private static void simplify() {
+        // 处理 BinOp 表达式
         TriFunction<String, Expr, Expr, Expr> binopcase =
                 (opname, left, right) -> {
+                    // 处理加法
                     if ("+".equals(opname)) {
                         if (left instanceof Number && ((Number) left).val == 0) {
                             return right;
@@ -24,6 +26,7 @@ public class PatternMatching {
                             return left;
                         }
                     }
+                    // 处理乘法
                     if ("*".equals(opname)) {
                         if (left instanceof Number && ((Number) left).val == 1) {
                             return right;
@@ -34,10 +37,13 @@ public class PatternMatching {
                     }
                     return new BinOp(opname, left, right);
                 };
+        // 处理 Number 对象
         Function<Integer, Expr> numcase = val -> new Number(val);
+        // 如果用户提供的 Expr 无法识别时进行的默认处理机制
         Supplier<Expr> defaultcase = () -> new Number(0);
 
         Expr e = new BinOp("+", new Number(5), new Number(0));
+        // 进行模式匹配
         Expr match = patternMatchExpr(e, binopcase, numcase, defaultcase);
         if (match instanceof Number) {
             System.out.println("Number: " + match);

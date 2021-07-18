@@ -13,6 +13,8 @@ public class Combinators {
     }
 
     static <A> Function<A, A> repeat(int n, Function<A, A> f) {
+        // 如果 n 的值为 0 直接返回 什么也不做 的标识符
+        // 否则执行函数 f, 重复执行 n-1 次，紧接着再执行一次
         return n == 0 ? x -> x : compose(f, repeat(n - 1, f));
     }
 }
