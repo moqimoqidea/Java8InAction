@@ -12,6 +12,7 @@ public class Recursion {
         System.out.println(factorialTailRecursive(5));
     }
 
+    // 迭代式的阶乘计算
     public static int factorialIterative(int n) {
         int r = 1;
         for (int i = 1; i <= n; i++) {
@@ -20,15 +21,18 @@ public class Recursion {
         return r;
     }
 
+    // 递归式的阶乘计算
     public static long factorialRecursive(long n) {
         return n == 1 ? 1 : n*factorialRecursive(n-1);
     }
 
+    // 基于 Stream 的阶乘
     public static long factorialStreams(long n){
         return LongStream.rangeClosed(1, n)
                          .reduce(1, (long a, long b) -> a * b);
     }
 
+    // 基于 尾递归 的阶乘
     public static long factorialTailRecursive(long n) {
         return factorialHelper(1, n);
     }
